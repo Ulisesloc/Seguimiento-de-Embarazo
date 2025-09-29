@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Seguimiento de Embarazo</title>
+    <style>
+        /* Estilos Base */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1c1c1c;
+            color: #f0f0f0;
+            text-align: center;
+            padding-top: 50px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #00ffff;
+            margin-bottom: 5px;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: #00ff88;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+        
+        /* Panel de Datos (Cajas) */
+        .data-panel {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .data-box {
+            background: #2a2a2a;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            min-width: 150px;
+        }
+        .data-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #aaaaaa;
+        }
+        .data-box span {
+            display: block;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-top: 5px;
+            line-height: 1.2;
+        }
+        
+        /* Contenedor de Cuenta Regresiva */
+        #countdown-timer {
+            font-size: 4rem;
+            margin-top: 20px;
+            border: 3px solid #00ff88;
+            display: inline-block;
+            padding: 20px 40px;
+            border-radius: 15px;
+            background: #0d0d0d;
+        }
+
+        /* BARRA DE PROGRESO */
+        #progress-container {
+            width: 80%;
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #333;
+            border-radius: 10px;
+            height: 40px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        #progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #00ff88);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        /* Marcadores de Trimestre y Semanas Críticas */
+        .marker {
+            position: absolute;
+            height: 50px;
+            width: 2px;
+            background-color: #f0f0f0;
+            top: -5px;
+            z-index: 10;
+        }
+        .marker-label {
+            position: absolute;
+            top: 55px;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #ccc;
+            white-space: nowrap;
+        }
+        
+        /* Semanas Clave (Basadas en 40 semanas) */
+        .m-12 { left: calc(12 / 40 * 100%); background-color: orange; }
+        .l-12 { left: calc(12 / 40 * 100%); }
+        .m-27 { left: calc(27 / 40 * 100%); background-color: gold; }
+        .l-27 { left: calc(27 / 40 * 100%); }
+        .m-37 { left: calc(37 / 40 * 100%); background-color: red; height: 60px; top: -10px; }
+        .l-37 { left: calc(37 / 40 * 100%); color: red; font-weight: bold;}
+
+        /* Mensaje Post-Parto */
+        #after-message {
+            display: none;
+            margin-top: 40px;
+        }
+        #after-message p {
+            font-size: 2rem;
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="main-title">Seguimiento de Embarazo</h1>
+
+    <h2>Tiempo Transcurrido</h2>
+    <div class="data-panel">
+        <div class="data-box">
+            <p>Semanas y Días</p>
+            <span id="semanasDiasTranscurridos">0 días</span>
+        </div>
+        <div class="data-box">
+            <p>Meses y Días</p>
+            <span id="mesesDiasTranscurridos">0 días</span>
+        </div>
+    </div>
+    
+    <h2>Progreso de la Gestación (40 Semanas)</h2>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+        <div class="marker m-12"></div>
+        <span class="marker-label l-12">1er Trimestre (12 sem)</span>
+        <div class="marker m-27"></div>
+        <span class="marker-label l-27">2do Trimestre (27 sem)</span>
+        <div class="marker m-37"></div>
+        <span class="marker-label l-37">Término (37 sem)</span>
+    </div>
+
+    <div id="countdown-container">
+        <h2>Faltan para el Nacimiento</h2>
+        <div id="countdown-timer"></div>
+    </div>
+
+    <div id="after-message">
+        <p>¡Bienvenido/a al mundo! ❤️</p>
+    </div>
+
+    <script>
+        // #############################
+        // === CONFIGURACIÓN DE FECHAS FIJAS (Verifica estas fechas) ===
+        // #############################
+        
+        // Fecha de Última Menstruación: Inicio de la cuenta (40 semanas)
+        const FECHA_INICIO_EMBARAZO_STR = "2025-08-17"; 
+        
+        // Fecha Probable de Parto: Final de la cuenta
+        const FECHA_FINAL_PARTO_STR = "2026-05-24"; 
+
+        // Duración total estándar de un embarazo en semanas
+        const TOTAL_SEMANAS = 40; 
+        // Días promedio en un mes
+        const DIAS_POR_MES_APROX = 30.44; 
+
+        // #############################
+        // === LÓGICA DEL CONTADOR ===
+        // #############################
+
+        const fechaInicio = new Date(FECHA_INICIO_EMBARAZO_STR);
+        const fechaFinal = new Date(FECHA_FINAL_PARTO_STR);
+
+        const fechaFinalMs = fechaFinal.getTime();
+        const fechaInicioMs = fechaInicio.getTime();
+
+        const MS_POR_SEGUNDO = 1000;
+        const MS_POR_MINUTO = MS_POR_SEGUNDO * 60;
+        const MS_POR_HORA = MS_POR_MINUTO * 60;
+        const MS_POR_DIA = MS_POR_HORA * 24;
+        const MS_POR_SEMANA = MS_POR_DIA * 7;
+
+        function updateCounters() {
+            const ahora = new Date().getTime();
+            
+            // --- CÁLCULO DE TIEMPO TRANSCURRIDO ---
+            let diferenciaTranscurrida = ahora - fechaInicioMs;
+            
+            if (diferenciaTranscurrida < 0) {
+                 diferenciaTranscurrida = 0;
+            }
+
+            const diasTranscurridosTotales = Math.floor(diferenciaTranscurrida / MS_POR_DIA);
+            
+            // 1. Semanas y Días Transcurridos
+            const semanas = Math.floor(diasTranscurridosTotales / 7);
+            const diasRestantesSemanas = diasTranscurridosTotales % 7; 
+            
+            document.getElementById("semanasDiasTranscurridos").innerHTML = `${semanas} sem y ${diasRestantesSemanas} días`;
+            
+            // 2. Meses y Días Transcurridos
+            const mesesAprox = Math.floor(diasTranscurridosTotales / DIAS_POR_MES_APROX);
+            const diasMesesCompletos = Math.floor(mesesAprox * DIAS_POR_MES_APROX);
+            const diasRestantesMeses = diasTranscurridosTotales - diasMesesCompletos;
+            
+            document.getElementById("mesesDiasTranscurridos").innerHTML = `${mesesAprox} mes y ${diasRestantesMeses} días`;
+
+            // 3. Barra de Progreso
+            const porcentajeProgreso = Math.min(100, (diasTranscurridosTotales / (TOTAL_SEMANAS * 7)) * 100);
+            document.getElementById("progress-bar").style.width = `${porcentajeProgreso}%`;
+
+
+            // --- CUENTA REGRESIVA ---
+            const diferenciaRegresiva = fechaFinalMs - ahora;
+
+            // FIX: Aquí estaba el error de tipeo. Se cambió 'diferresciaRegresiva' por 'diferenciaRegresiva'.
+            if (diferenciaRegresiva <= 0) {
+                // El tiempo ha terminado
+                document.getElementById("countdown-container").style.display = "none";
+                document.getElementById("after-message").style.display = "block";
+                document.getElementById("semanasDiasTranscurridos").innerHTML = `${TOTAL_SEMANAS} sem y 0 días`;
+                document.getElementById("mesesDiasTranscurridos").innerHTML = `9 mes y 0 días`;
+                document.getElementById("progress-bar").style.width = `100%`;
+                clearInterval(timer);
+                return;
+            }
+
+            const dias = Math.floor(diferenciaRegresiva / MS_POR_DIA);
+            const horas = Math.floor((diferenciaRegresiva % MS_POR_DIA) / MS_POR_HORA);
+            const minutos = Math.floor((diferenciaRegresiva % MS_POR_HORA) / MS_POR_MINUTO);
+            const segundos = Math.floor((diferenciaRegresiva % MS_POR_MINUTO) / MS_POR_SEGUNDO);
+
+            // Mostrar la cuenta regresiva
+            document.getElementById("countdown-timer").innerText =
+                `${dias}d ${horas}h ${minutos}m ${segundos}s`;
+        }
+
+        // Ejecutar la función inmediatamente y luego cada segundo
+        updateCounters();
+        const timer = setInterval(updateCounters, 1000);
+    </script>
+
+</body>
+</html>
