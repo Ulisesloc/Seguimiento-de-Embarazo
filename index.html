@@ -198,7 +198,7 @@
                  diferenciaTranscurrida = 0;
             }
 
-            const diasTranscurridosTotales = Math.floor(diferenciaTranscurrida / MS_POR_DIA);
+            const diasTranscurridosTotales = Math.floor((diferenciaTranscurrida + MS_POR_DIA) / MS_POR_DIA);
             
             // 1. Semanas y Días Transcurridos
             const semanas = Math.floor(diasTranscurridosTotales / 7);
