@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Seguimiento de Embarazo</title>
+    <title>Seguimiento de Embarazo Avanzado</title>
     <style>
         /* Estilos Base */
         body {
@@ -109,6 +109,30 @@
         .m-37 { left: calc(37 / 40 * 100%); background-color: red; height: 60px; top: -10px; }
         .l-37 { left: calc(37 / 40 * 100%); color: red; font-weight: bold;}
 
+        /* SECCIÓN DE DESARROLLO FETAL */
+        #fetal-development {
+            width: 80%;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 15px;
+            text-align: left;
+            border: 1px solid #00ff8855;
+        }
+        #fetal-development h3 {
+            color: #00ffff;
+            font-size: 1.8rem;
+            margin-top: 0;
+            border-bottom: 2px solid #00ff88;
+            padding-bottom: 5px;
+        }
+        #fetal-development p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #e0e0e0;
+        }
+
         /* Mensaje Post-Parto */
         #after-message {
             display: none;
@@ -147,6 +171,10 @@
         <span class="marker-label l-37">Término (37 sem)</span>
     </div>
 
+    <div id="fetal-development">
+        <h3 id="fetal-title">Desarrollo Fetal Actual</h3>
+        <p id="fetal-description">Cargando...</p>
+    </div>
     <div id="countdown-container">
         <h2>Faltan para el Nacimiento</h2>
         <div id="countdown-timer"></div>
@@ -158,22 +186,164 @@
 
     <script>
         // #############################
-        // === CONFIGURACIÓN DE FECHAS FIJAS (Verifica estas fechas) ===
+        // === CONFIGURACIÓN DE FECHAS FIJAS ===
         // #############################
         
         // Fecha de Última Menstruación: Inicio de la cuenta (40 semanas)
         const FECHA_INICIO_EMBARAZO_STR = "2025-08-17T00:00:00Z"; 
         
-        // Fecha Probable de Parto: Final de la cuenta
+        // Fecha Probable de Parto: Ajuste de 6 horas (06:00:00Z) para medianoche GDL (GMT-6).
         const FECHA_FINAL_PARTO_STR = "2026-05-24T06:00:00Z"; 
 
-        // Duración total estándar de un embarazo en semanas
         const TOTAL_SEMANAS = 40; 
-        // Días promedio en un mes
         const DIAS_POR_MES_APROX = 30.44; 
 
         // #############################
-        // === LÓGICA DEL CONTADOR ===
+        // === LÓGICA DEL DESARROLLO FETAL (SWITCH/CASE) ===
+        // #############################
+
+        function displayFetalDevelopment(semanaActual) {
+            let title = `Semana ${semanaActual}: ¡Crecimiento en Curso!`;
+            let description = '¡El desarrollo está en marcha! Vuelve a revisar la información para esta semana.';
+
+            switch (semanaActual) {
+                // PRIMER TRIMESTRE (Ya existente)
+                case 5:
+                    description = 'El <strong>embrión es un pequeño disco engrosado</strong> que empieza a ser visible por ecografía. Mide unos <strong>2-3 mm</strong> y se sitúa dentro del saco gestacional.';
+                    break;
+                case 6:
+                    description = 'El embrión mide unos <strong>5 mm</strong> y es posible <strong>observar el latido cardíaco</strong>. ¡Un hito fundamental!';
+                    break;
+                case 7:
+                    description = 'El embrión ya mide entre <strong>7 y 17 mm</strong> y se distingue claramente el <strong>polo cefálico</strong> (la cabeza) del resto del cuerpo.';
+                    break;
+                case 8:
+                    description = 'Mide entre <strong>18 y 25 mm</strong>, la cabeza se le distingue perfectamente. Se empieza a formar el <strong>cerebro y la médula espinal</strong>. También se forman los esbozos de las cuatro extremidades.';
+                    break;
+                case 9:
+                    description = 'Mide entre <strong>25 y 35 mm</strong>, el cuerpo empieza a ser más largo respecto a la cabeza. Se van desarrollando las extremidades y empiezan a formarse los <strong>huesos de la cara</strong>.';
+                    break;
+                case 10:
+                    description = 'Mide entre <strong>35 y 45 mm</strong>, se forman las <strong>manos y los pies con sus dedos</strong> y ya tiene aspecto humano. Es capaz de mover las extremidades independientemente, y se forman las costillas y los huesos de la columna vertebral.';
+                    break;
+                case 11:
+                    description = 'El embrión mide entre <strong>40 y 60 mm</strong>. La cabeza mide la mitad de todo el embrión.';
+                    break;
+                case 12:
+                    title = `Semana ${semanaActual}: ¡Cambio a Feto!`;
+                    description = 'Mide entre <strong>60 y 80 mm</strong> y ya hablamos de <strong>feto</strong> y no de embrión. La formación de los órganos ha finalizado y empezará una etapa de crecimiento. Los riñones empiezan a formar orina.';
+                    break;
+                case 13:
+                    description = 'El feto mide entre <strong>6,5 y 8 cm</strong>. La cabeza sigue siendo desproporcionada. Los ojos se van centrando y los <strong>genitales externos ya están formados</strong>. Ya mueve las extremidades y empieza a utilizar las manos.';
+                    break;
+
+                // SEGUNDO TRIMESTRE
+                case 14:
+                    description = 'El feto mide cerca de <strong>9 cm</strong>. Sus movimientos son más coordinados. La piel está cubierta de un vello fino llamado <strong>lanugo</strong>.';
+                    break;
+                case 15:
+                    description = 'El feto ahora mide unos <strong>10 cm</strong>. Empieza a desarrollar la capacidad de oír. El cabello y las cejas comienzan a aparecer.';
+                    break;
+                case 16:
+                    description = 'Mide unos <strong>12 cm</strong>. El sistema nervioso está madurando y los músculos de la cara pueden hacer muecas. Sus movimientos pueden empezar a ser percibidos por la madre.';
+                    break;
+                case 17:
+                    description = 'El <strong>esqueleto fetal</strong> está cambiando de cartílago a hueso duro. La grasa comienza a acumularse. Mide alrededor de <strong>13 cm</strong> y pesa unos 150 gramos.';
+                    break;
+                case 18:
+                    description = 'Los genitales externos están bien desarrollados, y es un buen momento para intentar determinar el sexo por ecografía. El feto se mueve activamente.';
+                    break;
+                case 19:
+                    description = 'La piel del bebé está cubierta con una capa protectora cerosa llamada <strong>vérnix caseosa</strong>. Los órganos sensoriales se están desarrollando rápidamente.';
+                    break;
+                case 20:
+                    title = `Semana ${semanaActual}: ¡Mitad del Camino!`;
+                    description = 'Mide cerca de <strong>16 cm</strong> y pesa unos 300 gramos. El útero ha llegado a la altura del ombligo de la madre. El bebé está dormido o despierto de forma regular.';
+                    break;
+                case 21:
+                    description = 'El feto tiene un crecimiento rápido. Las <strong>papilas gustativas</strong> están comenzando a formarse y está tragando líquido amniótico regularmente.';
+                    break;
+                case 22:
+                    description = 'Las uñas de los dedos de manos y pies están formadas. El feto comienza a parecerse a un recién nacido en miniatura, aunque sigue muy delgado.';
+                    break;
+                case 23:
+                    description = 'Los pulmones comienzan a desarrollar las estructuras necesarias para respirar, aunque aún no están maduros. El bebé puede reaccionar a ruidos fuertes.';
+                    break;
+                case 24:
+                    description = 'El feto pesa cerca de <strong>600 gramos</strong>. Si naciera ahora, tendría una posibilidad de sobrevivir con cuidados intensivos (punto de viabilidad).';
+                    break;
+                case 25:
+                    description = 'El bebé comienza a ganar una cantidad significativa de peso. El cabello sigue creciendo y está desarrollando la coordinación.';
+                    break;
+                case 26:
+                    description = 'El feto puede abrir y cerrar los ojos, los cuales ya distinguen la luz. Sus <strong>huellas dactilares</strong> ya están formadas.';
+                    break;
+                case 27:
+                    title = `Semana ${semanaActual}: Fin del Segundo Trimestre`;
+                    description = 'El cerebro está muy activo. El bebé mide cerca de <strong>34 cm</strong> y pesa casi 900 gramos. Su desarrollo muscular continúa.';
+                    break;
+
+                // TERCER TRIMESTRE
+                case 28:
+                    description = 'El bebé está en el tercer trimestre y ahora puede parpadear. El desarrollo cerebral es clave en esta etapa. El sistema nervioso ya controla la respiración y la temperatura.';
+                    break;
+                case 29:
+                    description = 'El feto continúa ganando peso y la cabeza está creciendo para dar cabida al cerebro en desarrollo. Los huesos están completamente desarrollados pero siguen siendo blandos y flexibles.';
+                    break;
+                case 30:
+                    description = 'Mide cerca de <strong>40 cm</strong> y pesa <strong>1.3 kg</strong>. El bebé tiene un ciclo de sueño-vigilia bien definido y puede detectar la luz a través del abdomen de la madre.';
+                    break;
+                case 31:
+                    description = 'El feto está en su etapa de crecimiento más rápido. Los pulmones y el sistema digestivo están casi maduros.';
+                    break;
+                case 32:
+                    description = 'El lanugo (vello fino) comienza a caer. El bebé tiene periodos de sueño profundo y movimientos activos. El peso es de unos <strong>1.7 kg</strong>.';
+                    break;
+                case 33:
+                    description = 'El bebé está practicando movimientos de "agarre" con sus manos. El cerebro ya puede controlar la temperatura corporal.';
+                    break;
+                case 34:
+                    description = 'Si el bebé naciera ahora, es muy probable que no necesite asistencia para respirar. Los pulmones están casi listos para funcionar por sí mismos.';
+                    break;
+                case 35:
+                    description = 'El bebé es cada vez más grande y tiene menos espacio. Generalmente se coloca en <strong>posición fetal</strong> (cabeza abajo) preparándose para el parto.';
+                    break;
+                case 36:
+                    description = 'Mide cerca de <strong>47 cm</strong> y pesa unos <strong>2.6 kg</strong>. El bebé está ganando medio kilo por semana hasta el nacimiento. ¡Ya está casi a término!';
+                    break;
+                case 37:
+                    title = `Semana ${semanaActual}: ¡Término Completo!`;
+                    description = 'El bebé se considera a <strong>término completo</strong>. El vérnix caseosa se vuelve más grueso. Sigue creciendo, pero está listo para el nacimiento.';
+                    break;
+                case 38:
+                    description = 'El bebé sigue ganando peso y llenando el espacio restante. Los órganos están completamente maduros.';
+                    break;
+                case 39:
+                    description = 'El tórax es más prominente. El bebé está perdiendo el lanugo. El parto puede ocurrir en cualquier momento.';
+                    break;
+                case 40:
+                    title = `Semana ${semanaActual}: ¡Fecha Prevista de Parto!`;
+                    description = 'Es la <strong>Fecha Probable de Parto (FPP)</strong>. El bebé mide unos <strong>51 cm</strong> y pesa unos <strong>3.4 kg</strong> en promedio. ¡Felicidades, el gran día está aquí o muy cerca!';
+                    break;
+                
+                // Manejo de Semanas no Cubiertas o Post-Parto
+                default:
+                    if (semanaActual < 5) {
+                        title = 'Inicio de la Gestación';
+                        description = 'La concepción es reciente. Aún no hay datos de desarrollo fetal visibles, pero los cambios ya han comenzado.';
+                    } else if (semanaActual > TOTAL_SEMANAS) {
+                        title = '¡El bebé ya nació! ❤️';
+                        description = '¡La etapa de crecimiento fetal ha concluido! El desarrollo ahora se centra en el crecimiento y el aprendizaje fuera del vientre.';
+                    }
+                    break;
+            }
+
+            document.getElementById("fetal-title").innerText = title;
+            document.getElementById("fetal-description").innerHTML = description; // Esto ahora procesará las etiquetas <strong>
+        }
+
+        // #############################
+        // === LÓGICA DEL CONTADOR PRINCIPAL ===
         // #############################
 
         const fechaInicio = new Date(FECHA_INICIO_EMBARAZO_STR);
@@ -186,7 +356,7 @@
         const MS_POR_MINUTO = MS_POR_SEGUNDO * 60;
         const MS_POR_HORA = MS_POR_MINUTO * 60;
         const MS_POR_DIA = MS_POR_HORA * 24;
-        const MS_POR_SEMANA = MS_POR_DIA * 7;
+        // const MS_POR_SEMANA = MS_POR_DIA * 7; // No se usa directamente en esta lógica
 
         function updateCounters() {
             const ahora = new Date().getTime();
@@ -198,8 +368,9 @@
                  diferenciaTranscurrida = 0;
             }
 
-            const diasTranscurridosTotales = Math.floor((diferenciaTranscurrida + MS_POR_DIA) / MS_POR_DIA);
-            
+            // Cálculo de Días Totales (inclusivo: Día 1 = Día de inicio)
+            const diasTranscurridosTotales = Math.floor(diferenciaTranscurrida / MS_POR_DIA) + 1;
+
             // 1. Semanas y Días Transcurridos
             const semanas = Math.floor(diasTranscurridosTotales / 7);
             const diasRestantesSemanas = diasTranscurridosTotales % 7; 
@@ -213,7 +384,10 @@
             
             document.getElementById("mesesDiasTranscurridos").innerHTML = `${mesesAprox} mes y ${diasRestantesMeses} días`;
 
-            // 3. Barra de Progreso
+            // 3. LLAMADA A LA NUEVA FUNCIÓN DE DESARROLLO
+            displayFetalDevelopment(semanas); 
+
+            // 4. Barra de Progreso
             const porcentajeProgreso = Math.min(100, (diasTranscurridosTotales / (TOTAL_SEMANAS * 7)) * 100);
             document.getElementById("progress-bar").style.width = `${porcentajeProgreso}%`;
 
@@ -221,11 +395,12 @@
             // --- CUENTA REGRESIVA ---
             const diferenciaRegresiva = fechaFinalMs - ahora;
 
-            // FIX: Aquí estaba el error de tipeo. Se cambió 'diferresciaRegresiva' por 'diferenciaRegresiva'.
             if (diferenciaRegresiva <= 0) {
                 // El tiempo ha terminado
                 document.getElementById("countdown-container").style.display = "none";
                 document.getElementById("after-message").style.display = "block";
+                document.getElementById("fetal-development").style.display = "none"; // Ocultar info fetal al terminar
+                
                 document.getElementById("semanasDiasTranscurridos").innerHTML = `${TOTAL_SEMANAS} sem y 0 días`;
                 document.getElementById("mesesDiasTranscurridos").innerHTML = `9 mes y 0 días`;
                 document.getElementById("progress-bar").style.width = `100%`;
